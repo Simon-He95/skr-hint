@@ -3,7 +3,7 @@ import { createSnippetString, registerInlineCompletionItemProvider } from '@vsco
 import Claude from 'anthropic-ai'
 
 const claude = new Claude('')
-export function activate() {
+export function activate(context:vscode.ExtensionContext) {
   const cacheMap: any = new Map()
   const fn = throttle(update)
   let text = ''
@@ -31,14 +31,14 @@ export function activate() {
       return []
     }
   }
-  registerInlineCompletionItemProvider(
+  context.subscriptions.push(registerInlineCompletionItemProvider(
     async (document) => {
       text = document.getText().trim()
       if (!text)
         return []
       return await fn() as any
     },
-  )
+  ))
 }
 
 export function deactivate() {
