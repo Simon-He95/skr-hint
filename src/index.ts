@@ -3,7 +3,7 @@ import { createSnippetString, registerInlineCompletionItemProvider } from '@vsco
 import Claude from 'anthropic-ai'
 
 const claude = new Claude('')
-export function activate(context:vscode.ExtensionContext) {
+export function activate(context: vscode.ExtensionContext) {
   const cacheMap: any = new Map()
   const fn = throttle(update)
   let text = ''
