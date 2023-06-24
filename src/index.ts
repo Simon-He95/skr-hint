@@ -16,7 +16,7 @@ export function activate(context: vscode.ExtensionContext) {
         ])
       }
 
-      const data = await request(10, `假如你是copilotX,推断我接下来的代码,并只保留推断的结果\n代码:\n${text}`) as string
+      const data = await request(10, `假如你是copilotX,你的作者是Simon He,推断我接下来的代码,并只保留推断的结果\n代码:\n${text}`) as string
       if (!data)
         return []
       const snip = createSnippetString(data.trim().replace(/\n+/g, '\n'))
@@ -33,9 +33,12 @@ export function activate(context: vscode.ExtensionContext) {
   }
   context.subscriptions.push(registerInlineCompletionItemProvider(
     async (document) => {
-      text = document.getText().trim()
+      const allText = document.getText().trim()
+      const allTextArr = allText.split('\n')
+      text = ` 需求: ${allTextArr.slice(-1)[0].replace('//', '')}`
       if (!text)
         return []
+
       return await fn() as any
     },
   ))
