@@ -4,23 +4,14 @@ import Claude from 'anthropic-ai'
 
 const claude = new Claude('')
 export function activate(context: vscode.ExtensionContext) {
-  const cacheMap: any = new Map()
   const fn = throttle(update)
   let text = ''
   async function update() {
     try {
-      if (cacheMap.has(text)) {
-        return new vscode.InlineCompletionList([
-          new vscode.InlineCompletionItem(cacheMap.get(text)),
-          new vscode.InlineCompletionItem(cacheMap.get(text)),
-        ])
-      }
-
-      const data = await request(10, `假如你是copilotX,你的作者是Simon He,推断我接下来的代码,并只保留推断的结果\n代码:\n${text}`) as string
+      const data = await request(10, `假如你是copilotX,我给你取名叫熊猫哥,你的作者是Simon He,推断我接下来的代码,并只保留推断的结果\n代码:\n${text}`) as string
       if (!data)
         return []
       const snip = createSnippetString(data.trim().replace(/\n+/g, '\n'))
-      cacheMap.set(text, snip)
 
       return new vscode.InlineCompletionList([
         new vscode.InlineCompletionItem(snip),
