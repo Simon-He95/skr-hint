@@ -1,15 +1,16 @@
 import * as vscode from 'vscode'
-import { createSnippetString, registerInlineCompletionItemProvider } from '@vscode-use/utils'
+import { createSnippetString, getActiveTextEditorLanguageId, getSelection, registerInlineCompletionItemProvider } from '@vscode-use/utils'
 import Claude from 'anthropic-ai'
+import { findArea } from './utils'
 
 const claude = new Claude('')
 export function activate(context: vscode.ExtensionContext) {
   const fn = throttle(update)
-  let text = ''
+  let text: string | undefined = ''
   async function update() {
     try {
-      const data = await request(10, `假如你是copilotX,我给你取名叫熊猫哥,你的作者是Simon He,推断我接下来的代码,并只保留推断的结果\n代码:\n${text}`) as string
-      if (!data)
+      const data = await request(10, `你是一名优秀的代码推断AI,我给你取名叫熊猫哥,你的作者是Simon He,推断我接下来的代码,并只保留推断的结果\n代码:\n ${text}`) as string
+      if (!data || data.trim().replace(/\s+/g, ' ') === text.replace(/\s+/g, ' '))
         return []
       const snip = createSnippetString(data.trim().replace(/\n+/g, '\n'))
 
@@ -24,9 +25,9 @@ export function activate(context: vscode.ExtensionContext) {
   }
   context.subscriptions.push(registerInlineCompletionItemProvider(
     async (document) => {
+      const { line, lineText } = getSelection()!
       const allText = document.getText().trim()
-      const allTextArr = allText.split('\n')
-      text = ` 需求: ${allTextArr.slice(-1)[0].replace('//', '')}`
+      text = findArea(allText, lineText, line, getActiveTextEditorLanguageId()!)
       if (!text)
         return []
 
@@ -58,7 +59,7 @@ function request(max = 10, text: string) {
   return new Promise((resolve) => {
     Promise.race(array.map(() => {
       return new Promise((resolve) => {
-        claude.complete(`假如你是copilotX,推断我接下来的代码,并只保留推断的结果\n代码:\n${text}`, {
+        claude.complete(text, {
           model: '1.3',
         }).then(resolve)
       })
