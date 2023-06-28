@@ -2,7 +2,7 @@
   "publisher": "simonhe",
   "name": "skr-hint",
   "displayName": "skr-hint",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "packageManager": "pnpm@8.1.1",
   "description": "skr-hint",
   "author": "Simon He <https://github.com/Simon-He95>",
