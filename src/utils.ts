@@ -55,7 +55,7 @@ function commonFind(content: string, lineText: string, line: number) {
   let stack = 0
   for (let i = line; i >= 0; i--) {
     const _lineText = contents[i]
-    if (lineText.includes('}'))
+    if (_lineText.includes('}'))
       stack++
     if (_lineText.includes('{') && stack === 0) {
       start = i
